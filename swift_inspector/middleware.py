@@ -88,6 +88,7 @@ class InspectorMiddleware(object):
 def filter_factory(global_conf, **local_conf):
     conf = global_conf.copy()
     conf.update(local_conf)
+    utils.register_swift_info('inspector')
 
     def informant_filter(app):
         return InspectorMiddleware(app, conf)
