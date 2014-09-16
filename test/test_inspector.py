@@ -27,6 +27,7 @@ ERROR_MSG_EXPIRED = 'Invalid Header: Inspector-Expires has expired'
 ERROR_MSG_INVALID_SIG = 'Invalid Signature'
 ERROR_MSG_INVALID_EXPIRES = (
     'Invalid Header: Inspector-Expires must be an integer')
+ERROR_MSG_INVALID_INSPECTOR = 'Invalid Inspectors: {0}'
 
 status = None
 headers = None
@@ -285,6 +286,28 @@ class TestInspector(unittest.TestCase):
         self.assertEqual(exc_info, None)
         self.assertTrue(body == '')
 
+    def test_error_headers_added_with_invalid_inspector(self):
+        app = get_fake_app()
+        inspector = 'Foo Timing Bar'
+        env = _make_env(inspector=inspector)
+
+        body = ''.join(app(env, start_response))
+        (status, headers, exc_info) = get_response()
+
+        inspector_error = None
+        for h, v in headers:
+            h = h.lower()
+            if h == 'inspector-error':
+                inspector_error = v
+                break
+            self.assertFalse(h.startswith('inspector'),
+                             'True is not false ("{0}", "{1}")'.format(h, v))
+
+        self.assertTrue(inspector_error ==
+                        ERROR_MSG_INVALID_INSPECTOR.format('Foo, Bar'))
+        self.assertEqual(status, '200 OK')
+        self.assertEqual(exc_info, None)
+        self.assertTrue(body == '')
 
 if __name__ == '__main__':
     unittest.main()

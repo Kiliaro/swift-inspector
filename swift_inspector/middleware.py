@@ -17,6 +17,8 @@ import swift.common.swob as swob
 import swift.common.utils as utils
 import time
 
+import swift_inspector.timing
+
 
 def create_sig(inspector, expires, key):
     inspector = ' '.join(inspector).lower()
@@ -28,6 +30,11 @@ def create_sig(inspector, expires, key):
 
 class InspectorError(Exception):
     pass
+
+
+inspector_handlers = {
+    'timing': swift_inspector.timing.wrapper
+}
 
 
 class InspectorMiddleware(object):
@@ -69,15 +76,22 @@ class InspectorMiddleware(object):
                     'Invalid Header: Inspector-Expires must be an integer',
                     env, start_response)
 
-        start = time.time()
+        _start_response = start_response
+        inspector_errors = []
 
-        def _start_response(status, headers, exc_info=None):
-            """start_response wrapper to add request status to env."""
-            end = time.time()
-            headers.append(('Inspector-Timing', str(end - start)))
-            start_response(status, headers, exc_info)
+        def inspector_start_response(status, headers, exc_info=None):
+            if inspector_errors:
+                errors = ', '.join(inspector_errors).title()
+                headers.append(('Inspector-Error',
+                                'Invalid Inspectors: {0}'.format(errors)))
+            return _start_response(status, headers, exc_info)
 
-        return self.app(env, _start_response)
+        for i in inspector:
+            if i not in inspector_handlers:
+                inspector_errors.append(i)
+                continue
+            _start_response = inspector_handlers[i](env, _start_response)
+        return self.app(env, inspector_start_response)
 
     def __call__(self, env, start_response):
         if 'HTTP_INSPECTOR' in env:
