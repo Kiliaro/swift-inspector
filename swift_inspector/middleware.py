@@ -23,7 +23,7 @@ import swift_inspector.timing
 
 def create_sig(inspector, expires, key):
     inspector = ' '.join(inspector).lower()
-    expires = float(expires)
+    expires = int(expires)
     hmac_body = '{0}\n{1}'.format(inspector, expires)
     sig = hmac.new(key, hmac_body, hashlib.sha1).hexdigest()
     return sig
@@ -66,7 +66,7 @@ class InspectorMiddleware(object):
                     raise InspectorError('Missing Header: Inspector-Sig')
                 if expires == '':
                     raise InspectorError('Missing Header: Inspector-Expires')
-                if float(expires) < time.time():
+                if int(expires) < int(time.time()):
                     raise InspectorError(
                         'Invalid Header: Inspector-Expires has expired')
                 valid_sig = create_sig(inspector, expires, self.hmac_key)

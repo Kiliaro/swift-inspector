@@ -54,7 +54,7 @@ def main():
 
     args = parser.parse_args()
 
-    inspector = ' '.join(args.inspector)
+    inspector = args.inspector
     expires = args.expires or get_expires(args.expires_in)
     signature = create_sig(inspector, expires, args.key)
 
@@ -63,7 +63,8 @@ def main():
     else:
         print("-H'Inspector: {0}' "
               "-H'Inspector-Expires: {1}' "
-              "-H'Inspector-Sig: {2}'".format(inspector, expires, signature))
+              "-H'Inspector-Sig: {2}'".format(
+                  ' '.join(inspector), expires, signature))
 
 
 if __name__ == '__main__':
