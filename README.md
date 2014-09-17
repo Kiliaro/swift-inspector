@@ -10,7 +10,7 @@ Current Inspectors
   amount of time it took the proxy server to process the request.
 
 ```Shell
-$ curl -i -XGET -H'x-auth-token: AUTH_tkd03626426c8647aeba7eb150330e8be6' http://127.0.0.1:8080/v1/AUTH_test/example_container -H'inspector: timing'
+$ curl -i -XGET -H'x-auth-token: AUTH_tkd03626426c8647aeba7eb150330e8be6' http://127.0.0.1:8080/v1/AUTH_test/example_container -H'Inspector: Timing'
 HTTP/1.1 200 OK
 ...
 Inspector-Timing: 0.0140538215637
@@ -22,7 +22,7 @@ example_object
   what account/container/object servers the path resides on.
 
 ```Shell
-$ curl -i -XGET -H'x-auth-token: AUTH_tkd03626426c8647aeba7eb150330e8be6' http://127.0.0.1:8080/v1/AUTH_test/example_container -H'inspector: locations'
+$ curl -i -XGET -H'x-auth-token: AUTH_tkd03626426c8647aeba7eb150330e8be6' http://127.0.0.1:8080/v1/AUTH_test/example_container -H'Inspector: Locations'
 HTTP/1.1 200 OK
 ...
 Inspector-Locations: http://127.0.0.1:6041/sdb4/178, http://127.0.0.1:6021/sdb2/178, http://127.0.0.1:6011/sdb1/178
