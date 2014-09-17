@@ -17,13 +17,14 @@ import swift.common.swob as swob
 import swift.common.utils as utils
 import time
 
+import swift_inspector.locations
 import swift_inspector.timing
 
 
 def create_sig(inspector, expires, key):
     inspector = ' '.join(inspector).lower()
     expires = float(expires)
-    hmac_body = '%s\n%s'.format(inspector, expires)
+    hmac_body = '{0}\n{1}'.format(inspector, expires)
     sig = hmac.new(key, hmac_body, hashlib.sha1).hexdigest()
     return sig
 
@@ -33,6 +34,7 @@ class InspectorError(Exception):
 
 
 inspector_handlers = {
+    'locations': swift_inspector.locations.wrapper,
     'timing': swift_inspector.timing.wrapper
 }
 
@@ -43,6 +45,7 @@ class InspectorMiddleware(object):
         self.app = app
         self.logger = utils.get_logger(conf, log_route='informant')
         self.hmac_key = conf.get('hmac_key')
+        self.swift_dir = conf.get('here', '/etc/swift')
 
     def handle_error(self, msg, env, start_response):
         def _start_response(status, headers, exc_info=None):
@@ -90,7 +93,8 @@ class InspectorMiddleware(object):
             if i not in inspector_handlers:
                 inspector_errors.append(i)
                 continue
-            _start_response = inspector_handlers[i](env, _start_response)
+            _start_response = inspector_handlers[i](
+                env, _start_response, self.app, {'swift_dir': self.swift_dir})
         return self.app(env, inspector_start_response)
 
     def __call__(self, env, start_response):
