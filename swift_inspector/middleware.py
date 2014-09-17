@@ -106,7 +106,12 @@ class InspectorMiddleware(object):
 def filter_factory(global_conf, **local_conf):
     conf = global_conf.copy()
     conf.update(local_conf)
-    utils.register_swift_info('inspector')
+    exclude_inspectors = local_conf.get('exclude', '').lower().split()
+    for inspector in exclude_inspectors:
+        if inspector in inspector_handlers:
+            del inspector_handlers[inspector]
+    avaiable_inspectors = [i.title() for i in inspector_handlers]
+    utils.register_swift_info('inspector', inspectors=avaiable_inspectors)
 
     def informant_filter(app):
         return InspectorMiddleware(app, conf)
