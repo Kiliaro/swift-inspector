@@ -12,7 +12,7 @@ Current Inspectors
   amount of time it took the proxy server to process the request.
 
 ```Shell
-$ curl -i -XGET -H'x-auth-token: AUTH_tkd03626426c8647aeba7eb150330e8be6' http://127.0.0.1:8080/v1/AUTH_test/example_container -H'Inspector: Timing'
+$ curl -i -H'Inspector: Timing' -XGET -H'x-auth-token: AUTH_tkd03626426c8647aeba7eb150330e8be6' http://127.0.0.1:8080/v1/AUTH_test/example_container
 HTTP/1.1 200 OK
 ...
 Inspector-Timing: 0.0140538215637
@@ -20,14 +20,17 @@ Inspector-Timing: 0.0140538215637
 example_object
 ```
 
-* Locations - Adds the "Inspector-Locations" header to the request indicating 
-  what account/container/object servers the path resides on.
+* Nodes - Adds the "Inspector-Nodes" and "Inspector-More-Nodes" headers to the
+  request.  "Inspector-Nodes" indicates what account/container/object servers
+  the path resides on.  "Inspector-More-Nodes" indicates extra nodes for a
+  partition for hinted handoff.
 
 ```Shell
-$ curl -i -XGET -H'x-auth-token: AUTH_tkd03626426c8647aeba7eb150330e8be6' http://127.0.0.1:8080/v1/AUTH_test/example_container -H'Inspector: Locations'
+$ curl -i -H'Inspector: Nodes' -XGET -H'x-auth-token: AUTH_tkd03626426c8647aeba7eb150330e8be6' http://127.0.0.1:8080/v1/AUTH_test/example_container
 HTTP/1.1 200 OK
 ...
-Inspector-Locations: http://127.0.0.1:6041/sdb4/178, http://127.0.0.1:6021/sdb2/178, http://127.0.0.1:6011/sdb1/178
+Inspector-Nodes: http://127.0.0.1:6042/sdb4/802, http://127.0.0.1:6032/sdb3/802, http://127.0.0.1:6022/sdb2/802
+Inspector-More-Nodes: http://127.0.0.1:6012/sdb1/802
 
 example_object
 ```
@@ -57,7 +60,7 @@ hmac_key = Password1
 # exclude - List of inspector names separated by spaces to exclude.  This 
 #           will cause a invalid inspector error if a request attempts to
 #           request it.
-exclude = Locations
+exclude = Nodes
 ```
 
 * Restart your proxy servers.

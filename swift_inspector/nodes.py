@@ -44,28 +44,45 @@ def wrapper(env, start_response, app, config):
                 storage_policy_index, swift_dir)
             partition, nodes = obj_ring.get_nodes(
                 account, container, obj)
-            location_template = ('http://{ip}:{port}/{device}/{partition}')
+            more_nodes = obj_ring.get_more_nodes(partition)
+            nodes_template = ('http://{ip}:{port}/{device}/{partition}')
         elif container is not None:
             partition, nodes = ring.Ring(
                 swift_dir, ring_name='container').get_nodes(account, container)
-            location_template = ('http://{ip}:{port}/{device}/{partition}')
+            more_nodes = ring.Ring(
+                swift_dir, ring_name='container').get_more_nodes(partition)
+            nodes_template = ('http://{ip}:{port}/{device}/{partition}')
         else:
             partition, nodes = ring.Ring(
                 swift_dir, ring_name='account').get_nodes(account)
-            location_template = ('http://{ip}:{port}/{device}/{partition}')
+            more_nodes = ring.Ring(
+                swift_dir, ring_name='account').get_more_nodes(partition)
+            nodes_template = ('http://{ip}:{port}/{device}/{partition}')
 
-        locations = []
+        object_nodes = []
         for node in nodes:
-            location = location_template.format(
+            object_nodes.append(nodes_template.format(
                 ip=node['ip'],
                 port=node['port'],
                 device=node['device'],
                 partition=partition,
                 account=urllib.quote(account),
                 container=urllib.quote(container or ''),
-                obj=urllib.quote(obj or ''))
-            locations.append(location)
-        headers.append(('Inspector-Locations', ', '.join(locations)))
+                obj=urllib.quote(obj or '')))
+        headers.append(('Inspector-Nodes', ', '.join(object_nodes)))
+
+        object_more_nodes = []
+        for node in more_nodes:
+            object_more_nodes.append(nodes_template.format(
+                ip=node['ip'],
+                port=node['port'],
+                device=node['device'],
+                partition=partition,
+                account=urllib.quote(account),
+                container=urllib.quote(container or ''),
+                obj=urllib.quote(obj or '')))
+        headers.append(('Inspector-More-Nodes', ', '.join(
+            object_more_nodes)))
 
         return start_response(status, headers, exc_info)
 

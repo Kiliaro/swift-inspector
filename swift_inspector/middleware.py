@@ -17,7 +17,7 @@ import swift.common.swob as swob
 import swift.common.utils as utils
 import time
 
-import swift_inspector.locations
+import swift_inspector.nodes
 import swift_inspector.timing
 
 
@@ -34,7 +34,7 @@ class InspectorError(Exception):
 
 
 inspector_handlers = {
-    'locations': swift_inspector.locations.wrapper,
+    'nodes': swift_inspector.nodes.wrapper,
     'timing': swift_inspector.timing.wrapper
 }
 

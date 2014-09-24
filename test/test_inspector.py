@@ -135,7 +135,7 @@ class TestInspector(unittest.TestCase):
         app = get_fake_app(config={'hmac_key': hmac_key})
         inspector = 'Timing'
         expires = int(time.time() + 86400)
-        sig = hmac.new(hmac_key, '%s\n%s'.format(inspector.lower(), expires),
+        sig = hmac.new(hmac_key, '{0}\n{1}'.format(inspector.lower(), expires),
                        hashlib.sha1).hexdigest()
         env = _make_env(inspector=inspector, expires=expires, sig=sig)
 
