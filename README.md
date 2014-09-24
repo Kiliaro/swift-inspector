@@ -1,3 +1,5 @@
+![Swift-Inspector Logo](https://raw.githubusercontent.com/hurricanerix/swift-inspector/master/resources/swift-inspector.png)
+
 Swift Inspector
 ===============
 
