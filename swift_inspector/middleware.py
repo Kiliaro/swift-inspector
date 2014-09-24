@@ -13,10 +13,12 @@
 
 import hashlib
 import hmac
-import swift.common.swob as swob
-import swift.common.utils as utils
 import time
 
+import swift.common.swob as swob
+import swift.common.utils as utils
+
+import swift_inspector.handlers
 import swift_inspector.nodes
 import swift_inspector.timing
 
@@ -34,6 +36,7 @@ class InspectorError(Exception):
 
 
 inspector_handlers = {
+    'handlers': swift_inspector.handlers.wrapper,
     'nodes': swift_inspector.nodes.wrapper,
     'timing': swift_inspector.timing.wrapper
 }

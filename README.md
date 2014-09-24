@@ -20,6 +20,23 @@ Inspector-Timing: 0.0140538215637
 example_object
 ```
 
+* Handlers - Adds the "Inspector-Handlers" and "Inspector-Handlers-Proxy"
+  headers to the request.  "Inspector-Handlers" is meant to return the
+  account/container/object servers that were contacted in the request, but
+  is currently unimplemented.  As such it always returns "Unknown".
+  "Inspector-Handlers-Proxy" returns the proxy that handled the request.
+
+```Shell
+curl -i -XGET  -H'inspector: Handlers' -H'x-auth-token: AUTH_tk9b6a1f4321dd4108afdfbb609c31c199' http://127.0.0.1:8080/v1/AUTH_test/example_container
+HTTP/1.1 200 OK
+...
+Inspector-Proxy: 192.168.0.1
+Inspector-Handlers: Unknown
+...
+
+example_object
+```
+
 * Nodes - Adds the "Inspector-Nodes" and "Inspector-More-Nodes" headers to the
   request.  "Inspector-Nodes" indicates what account/container/object servers
   the path resides on.  "Inspector-More-Nodes" indicates extra nodes for a

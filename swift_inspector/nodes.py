@@ -10,11 +10,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import urllib
+
 import swift.common.ring as ring
 import swift.common.storage_policy as storage_policy
 import swift.common.swob as swob
 import swift.proxy.controllers.base as controllers
-import urllib
 
 
 def wrapper(env, start_response, app, config):
