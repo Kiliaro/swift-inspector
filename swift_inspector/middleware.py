@@ -17,10 +17,7 @@ import time
 
 import swift.common.swob as swob
 import swift.common.utils as utils
-
-import swift_inspector.handlers
-import swift_inspector.nodes
-import swift_inspector.timing
+from swift_inspector.inspectors import inspector_handlers
 
 
 def create_sig(inspector, expires, key):
@@ -33,13 +30,6 @@ def create_sig(inspector, expires, key):
 
 class InspectorError(Exception):
     pass
-
-
-inspector_handlers = {
-    'handlers': swift_inspector.handlers.wrapper,
-    'nodes': swift_inspector.nodes.wrapper,
-    'timing': swift_inspector.timing.wrapper
-}
 
 
 class InspectorMiddleware(object):
