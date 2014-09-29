@@ -37,7 +37,7 @@ setup(
     install_requires=[],
     entry_points={
         'paste.filter_factory': [
-            'swift_inspector=swift_inspector.middleware:filter_factory',
+            'swift_proxy_inspector=swift_inspector.middleware.proxy:filter_factory',
             ],
         },
     )
