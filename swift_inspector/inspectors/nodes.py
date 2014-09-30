@@ -18,7 +18,7 @@ import swift.common.swob as swob
 import swift.proxy.controllers.base as controllers
 
 
-def wrapper(env, start_response, app, config):
+def proxy_wrapper(env, start_response, app, config):
     swift_dir = config.get('swift_dir')
     request = swob.Request(env)
 

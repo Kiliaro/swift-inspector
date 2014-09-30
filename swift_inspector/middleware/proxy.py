@@ -17,7 +17,9 @@ import time
 
 import swift.common.swob as swob
 import swift.common.utils as utils
-from swift_inspector.inspectors import inspector_handlers
+
+from swift_inspector.inspectors import (
+    inspector_proxy_handlers as inspector_handlers)
 
 
 def create_sig(inspector, expires, key):

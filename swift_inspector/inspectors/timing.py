@@ -14,7 +14,7 @@
 import time
 
 
-def wrapper(env, start_response, app, config):
+def proxy_wrapper(env, start_response, app, config):
     def _start_response(status, headers, exc_info=None):
         """start_response wrapper to add request status to env."""
         end = time.time()
