@@ -38,6 +38,7 @@ setup(
     entry_points={
         'paste.filter_factory': [
             'swift_proxy_inspector=swift_inspector.middleware.proxy:filter_factory',
+            'swift_object_inspector=swift_inspector.middleware.object:filter_factory',
             ],
         },
     )

@@ -16,7 +16,7 @@ import hmac
 import time
 import unittest
 
-from swift_inspector import middleware
+from swift_inspector.middleware import proxy
 
 
 VALID_INSPECTORS = 'Timing'
@@ -71,7 +71,7 @@ def get_fake_app(config=None):
         start_response('200 OK', headers)
         return ['']
 
-    return middleware.InspectorMiddleware(fake_app, config)
+    return proxy.InspectorMiddleware(fake_app, config)
 
 
 def _make_env(inspector=None, expires=None, sig=None):

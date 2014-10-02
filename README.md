@@ -12,7 +12,7 @@ Current Inspectors
   amount of time it took the proxy server to process the request.
 
 ```Shell
-$ curl -i -H'Inspector: Timing' -XGET -H'x-auth-token: AUTH_tkd03626426c8647aeba7eb150330e8be6' http://127.0.0.1:8080/v1/AUTH_test/example_container
+$ curl -i -H'Inspector: Timing' -XGET -H'x-auth-token: AUTH_tkd03626426c8647aeba7eb150330e8be6' http://127.0.0.1:8080/v1/AUTH_test/c
 HTTP/1.1 200 OK
 ...
 Inspector-Timing: 0.0140538215637
@@ -27,14 +27,14 @@ example_object
   "Inspector-Handlers-Proxy" returns the proxy that handled the request.
 
 ```Shell
-curl -i -XGET  -H'inspector: Handlers' -H'x-auth-token: AUTH_tk9b6a1f4321dd4108afdfbb609c31c199' http://127.0.0.1:8080/v1/AUTH_test/example_container
+curl -i -XGET  -H'inspector: Handlers' -H'x-auth-token: AUTH_tk9b6a1f4321dd4108afdfbb609c31c199' http://127.0.0.1:8080/v1/AUTH_test/c/o
 HTTP/1.1 200 OK
 ...
-Inspector-Proxy: 192.168.0.1
-Inspector-Handlers: Unknown
+Inspector-Handlers-Proxy: http://192.168.0.1:8080/v1/AUTH_test/c/o
+Inspector-Handlers-Object: http://127.0.0.1:6030/sdb3/312/AUTH_test/c/o
 ...
 
-example_object
+example_object_data
 ```
 
 * Nodes - Adds the "Inspector-Nodes" and "Inspector-More-Nodes" headers to the
@@ -43,7 +43,7 @@ example_object
   partition for hinted handoff.
 
 ```Shell
-$ curl -i -H'Inspector: Nodes' -XGET -H'x-auth-token: AUTH_tkd03626426c8647aeba7eb150330e8be6' http://127.0.0.1:8080/v1/AUTH_test/example_container
+$ curl -i -H'Inspector: Nodes' -XGET -H'x-auth-token: AUTH_tkd03626426c8647aeba7eb150330e8be6' http://127.0.0.1:8080/v1/AUTH_test/c
 HTTP/1.1 200 OK
 ...
 Inspector-Nodes: http://127.0.0.1:6042/sdb4/802, http://127.0.0.1:6032/sdb3/802, http://127.0.0.1:6022/sdb2/802
@@ -55,17 +55,21 @@ example_object
 Configuration
 -------------
 
-* Add inspector to your pipeline, preferably immediatly after catch_errors.
+Swift Inspector currently supports middleware in the proxy and object servers.
+
+####Proxy Configuration
+
+* Add inspector to your pipeline, preferably immediately after gatekeeper.
 
 ```INI
-pipeline = catch_errors inspector ...
+pipeline = catch_errors gatekeeper inspector ...
 ```
 
 * Add the inspector filter.
 
 ```INI
 [filter:inspector]
-use = egg:swift_inspector#swift_inspector
+use = egg:swift_inspector#swift_proxy_inspector
 # hmac_key - Key to restrict access to the inspector feature.  if set, will
 #            require the additional headers 'Inspector-Expires'
 #            and 'Inspector-Sig'. Inspector-Expires represents a unix timestamp
@@ -80,4 +84,19 @@ hmac_key = Password1
 exclude = Nodes
 ```
 
-* Restart your proxy servers.
+####Object Server Configuration
+
+* Add inspector to the front of your pipeline.
+
+```INI
+pipeline = inspector recon ...
+```
+
+* Add the inspector filter.
+
+```INI
+[filter:inspector]
+use = egg:swift_inspector#swift_object_inspector
+```
+
+* Restart servers as needed.

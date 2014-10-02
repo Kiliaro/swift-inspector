@@ -84,10 +84,10 @@ class InspectorMiddleware(object):
             return _start_response(status, headers, exc_info)
 
         for i in inspector:
-            if i not in inspector_handlers['proxy']:
+            if i not in inspector_handlers['object']:
                 inspector_errors.append(i)
                 continue
-            _start_response = inspector_handlers['proxy'][i](
+            _start_response = inspector_handlers['object'][i](
                 env, _start_response, self.app, {'swift_dir': self.swift_dir})
         return self.app(env, inspector_start_response)
 
@@ -102,9 +102,9 @@ def filter_factory(global_conf, **local_conf):
     conf.update(local_conf)
     exclude_inspectors = local_conf.get('exclude', '').lower().split()
     for inspector in exclude_inspectors:
-        if inspector in inspector_handlers['proxy']:
-            del inspector_handlers['proxy'][inspector]
-    avaiable_inspectors = [i.title() for i in inspector_handlers['proxy']]
+        if inspector in inspector_handlers['object']:
+            del inspector_handlers['object'][inspector]
+    avaiable_inspectors = [i.title() for i in inspector_handlers['object']]
     utils.register_swift_info('inspector', inspectors=avaiable_inspectors)
 
     def informant_filter(app):

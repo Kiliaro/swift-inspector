@@ -27,19 +27,16 @@ def import_from(module, name):
     return getattr(module, name)
 
 
-inspector_proxy_handlers = {}
-inspector_account_handlers = {}
-inspector_container_handlers = {}
-inspector_object_handlers = {}
+inspector_handlers = {
+    'proxy': {},
+    'object': {}}
 
 
-for server_type in ['proxy', 'account', 'container', 'object']:
+for server_type in ['proxy', 'object']:
     for inspector_name in ['handlers', 'nodes', 'timing']:
         mod = import_from('swift_inspector.inspectors', inspector_name)
         try:
-            inspector_proxy_handlers[inspector_name] = getattr(
+            inspector_handlers[server_type][inspector_name] = getattr(
                 mod, '{0}_wrapper'.format(server_type))
         except AttributeError:
             continue
-
-print inspector_proxy_handlers  
