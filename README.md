@@ -81,7 +81,12 @@ hmac_key = Password1
 # exclude - List of inspector names separated by spaces to exclude.  This 
 #           will cause a invalid inspector error if a request attempts to
 #           request it.
-exclude = Nodes
+exclude =
+#
+# default - List of inspector names separated by spaces to automatically include.
+#           This is useful for a SAIO or dev instance where this information
+#           could be useful with most requests.
+default = Timing Handlers Nodes
 ```
 
 ####Object Server Configuration

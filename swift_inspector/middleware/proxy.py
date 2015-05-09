@@ -1,4 +1,4 @@
-# Copyright 2014 Richard Hawkins
+# Copyright 2014-2015 Richard Hawkins
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -35,11 +35,12 @@ class InspectorError(Exception):
 
 class InspectorMiddleware(object):
     """Swift Inspector Middleware use for inspecting Swift requests."""
-    def __init__(self, app, conf, *args, **kwargs):
+    def __init__(self, app, conf, default=None):
         self.app = app
-        self.logger = utils.get_logger(conf, log_route='informant')
+        self.logger = utils.get_logger(conf, log_route='inspector')
         self.hmac_key = conf.get('hmac_key')
         self.swift_dir = conf.get('here', '/etc/swift')
+        self.default = default
 
     def handle_error(self, msg, env, start_response):
         def _start_response(status, headers, exc_info=None):
@@ -52,6 +53,9 @@ class InspectorMiddleware(object):
         req = swob.Request(env)
 
         inspector = req.headers.get('inspector', '').lower().split()
+        if self.default:
+            inspector = self.default + inspector
+        
         if self.hmac_key:
             expires = req.headers.get('inspector_expires', '')
             sig = req.headers.get('inspector_sig', '')
@@ -84,6 +88,7 @@ class InspectorMiddleware(object):
             return _start_response(status, headers, exc_info)
 
         for i in inspector:
+            i = i.lower()
             if i not in inspector_handlers['proxy']:
                 inspector_errors.append(i)
                 continue
@@ -92,7 +97,7 @@ class InspectorMiddleware(object):
         return self.app(env, inspector_start_response)
 
     def __call__(self, env, start_response):
-        if 'HTTP_INSPECTOR' in env:
+        if self.default or 'HTTP_INSPECTOR' in env:
             return self.handle_request(env, start_response)
         return self.app(env, start_response)
 
@@ -105,8 +110,9 @@ def filter_factory(global_conf, **local_conf):
         if inspector in inspector_handlers['proxy']:
             del inspector_handlers['proxy'][inspector]
     avaiable_inspectors = [i.title() for i in inspector_handlers['proxy']]
-    utils.register_swift_info('inspector', inspectors=avaiable_inspectors)
+    default_inspectors = local_conf.get('default', '').title().split()
+    utils.register_swift_info('inspector', inspectors=avaiable_inspectors, default=default_inspectors)
 
-    def informant_filter(app):
-        return InspectorMiddleware(app, conf)
-    return informant_filter
+    def inspector_filter(app):
+        return InspectorMiddleware(app, conf, default=default_inspectors)
+    return inspector_filter
