@@ -24,8 +24,12 @@ def proxy_wrapper(env, start_response, app, config):
 
     def _start_response(status, headers, exc_info=None):
         """start_response wrapper to add request status to env."""
-        version, account, container, obj = request.split_path(
-            2, 4, rest_with_last=True)
+        try:
+            version, account, container, obj = request.split_path(
+                2, 4, rest_with_last=True)
+        except ValueError:
+            headers.append(('Inspector-Nodes', ''))
+            return start_response(status, headers, exc_info)
 
         if account is not None:
             account = urllib.unquote(account)
